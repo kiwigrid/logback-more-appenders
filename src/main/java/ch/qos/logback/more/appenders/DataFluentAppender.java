@@ -22,6 +22,8 @@
  */
 package ch.qos.logback.more.appenders;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -87,6 +89,10 @@ public class DataFluentAppender extends UnsynchronizedAppenderBase<ILoggingEvent
 			for (Entry<String, String> entry : rawData.getMDCPropertyMap().entrySet()) {
 				data.put(entry.getKey(), entry.getValue());
 			}
+			//until fluentd could not handle timestamps in ms put it in an own field
+			SimpleDateFormat formater = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
+			Date date = new Date(rawData.getTimeStamp());
+			data.put("timestampWithMillis", formater.format(date));
 			fluentLogger.log(label, data, rawData.getTimeStamp() / 1000);
 		}
 	}
